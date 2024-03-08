@@ -20,6 +20,10 @@
 #ifndef TRACKING_H
 #define TRACKING_H
 
+
+#include <opencv2/highgui.hpp>
+#include <opencv2/opencv.hpp>
+
 #include <opencv2/core/core.hpp>
 #include <opencv2/features2d/features2d.hpp>
 
@@ -180,7 +184,23 @@ public:
 
     vector<MapPoint*> GetLocalMapMPS();
 
+
+    //TEST--
+    bool mbNeedRectify;
+    //cv::Mat M1l, M2l;
+    //cv::Mat M1r, M2r;
+
     bool mbWriteStats;
+
+    // Vector of IMU measurements from previous to current frame (to be filled by PreintegrateIMU)
+    std::vector<IMU::Point> mvImuFromLastFrame;
+    std::mutex mMutexImuQueue;
+
+
+    Eigen::Quaternionf currentQ = Eigen::Quaternionf(1.0f, 0.0f, 0.0f, 0.0f);
+    Eigen::Quaternionf currentP = Eigen::Quaternionf(1.0f, 0.0f, 0.0f, 0.0f);
+
+
 
 #ifdef REGISTER_TIMES
     void LocalMapStats2File();
@@ -234,7 +254,12 @@ protected:
 
     // Reset IMU biases and compute frame velocity
     void ResetFrameIMU();
+    void ComputeGyroBias(const vector<Frame*> &vpFs, float &bwx,  float &bwy, float &bwz);
+    void ComputeVelocitiesAccBias(const vector<Frame*> &vpFs, float &bax,  float &bay, float &baz);
 
+    cv::Mat kalmanFilter(cv::Mat m);
+    cv::Mat fusion(cv::Mat m);
+    Eigen::Quaternionf integrate();
     bool mbMapUpdated;
 
     // Imu preintegration from last frame
@@ -243,9 +268,6 @@ protected:
     // Queue of IMU measurements between frames
     std::list<IMU::Point> mlQueueImuData;
 
-    // Vector of IMU measurements from previous to current frame (to be filled by PreintegrateIMU)
-    std::vector<IMU::Point> mvImuFromLastFrame;
-    std::mutex mMutexImuQueue;
 
     // Imu calibration parameters
     IMU::Calib *mpImuCalib;

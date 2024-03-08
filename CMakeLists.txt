@@ -7,8 +7,8 @@ ENDIF()
 
 MESSAGE("Build type: " ${CMAKE_BUILD_TYPE})
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -Wall   -O3")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall   -O3")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -w   -O3")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w   -O3")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -march=native")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native")
 # set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wno-deprecated -O3 -march=native ")
@@ -103,12 +103,16 @@ include_directories(
   ${CUDA_INCLUDE_DIRS}
 )
 
+cuda_include_directories(
+${CUDA_TOOLKIT_ROOT_DIR}/samples/common/inc
+)
+
 include(${PROJECT_SOURCE_DIR}/orb_slam3/Thirdparty/DBoW2/CMakeLists.txt)
 include(${PROJECT_SOURCE_DIR}/orb_slam3/Thirdparty/g2o/CMakeLists.txt)
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/orb_slam3/lib)
 
-add_library(${PROJECT_NAME} SHARED
+cuda_add_library(${PROJECT_NAME} SHARED
   orb_slam3/src/System.cc
   orb_slam3/src/Tracking.cc
   orb_slam3/src/LocalMapping.cc
@@ -176,6 +180,7 @@ add_library(${PROJECT_NAME} SHARED
   src/cuda/Fast_gpu.cu
   src/cuda/Orb_gpu.cu
   include/Utils.hpp
+  include/Kalman.h
 )
 
 target_link_libraries(${PROJECT_NAME}

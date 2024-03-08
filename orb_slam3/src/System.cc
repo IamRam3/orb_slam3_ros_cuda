@@ -111,7 +111,11 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
     cout << endl << "Loading ORB Vocabulary. This could take a while..." << endl;
 
     mpVocabulary = new ORBVocabulary();
-    bool bVocLoad = mpVocabulary->loadFromBinFile(strVocFile);
+    bool bVocLoad;
+    if (strVocFile.find("txt") != std::string::npos)
+        bVocLoad = mpVocabulary->loadFromTextFile(strVocFile);
+    else
+        bVocLoad = mpVocabulary->loadFromBinaryFile(strVocFile);
     if(!bVocLoad)
     {
         cerr << "Wrong path to vocabulary. " << endl;
@@ -291,6 +295,8 @@ Sophus::SE3f System::TrackStereo(const cv::Mat &imLeft, const cv::Mat &imRight, 
     if (mSensor == System::IMU_STEREO)
         for(size_t i_imu = 0; i_imu < vImuMeas.size(); i_imu++)
             mpTracker->GrabImuData(vImuMeas[i_imu]);
+
+    mpTracker->mvImuFromLastFrame.assign(vImuMeas.begin(), vImuMeas.end());
 
     // std::cout << "start GrabImageStereo" << std::endl;
     Sophus::SE3f Tcw = mpTracker->GrabImageStereo(imLeftToFeed,imRightToFeed,timestamp,filename);

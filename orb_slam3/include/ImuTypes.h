@@ -34,6 +34,9 @@
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/vector.hpp>
 
+#include "Converter.h"
+
+
 namespace ORB_SLAM3
 {
 
@@ -122,6 +125,7 @@ public:
     Sophus::SE3<float> mTcb;
     Sophus::SE3<float> mTbc;
     Eigen::DiagonalMatrix<float,6> Cov, CovWalk;
+    Eigen::Quaternionf Qcb;
     bool mbIsSet;
 };
 
