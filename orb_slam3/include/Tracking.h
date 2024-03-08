@@ -20,7 +20,6 @@
 #ifndef TRACKING_H
 #define TRACKING_H
 
-
 #include <opencv2/highgui.hpp>
 #include <opencv2/opencv.hpp>
 
@@ -184,23 +183,7 @@ public:
 
     vector<MapPoint*> GetLocalMapMPS();
 
-
-    //TEST--
-    bool mbNeedRectify;
-    //cv::Mat M1l, M2l;
-    //cv::Mat M1r, M2r;
-
     bool mbWriteStats;
-
-    // Vector of IMU measurements from previous to current frame (to be filled by PreintegrateIMU)
-    std::vector<IMU::Point> mvImuFromLastFrame;
-    std::mutex mMutexImuQueue;
-
-
-    Eigen::Quaternionf currentQ = Eigen::Quaternionf(1.0f, 0.0f, 0.0f, 0.0f);
-    Eigen::Quaternionf currentP = Eigen::Quaternionf(1.0f, 0.0f, 0.0f, 0.0f);
-
-
 
 #ifdef REGISTER_TIMES
     void LocalMapStats2File();
@@ -268,6 +251,9 @@ protected:
     // Queue of IMU measurements between frames
     std::list<IMU::Point> mlQueueImuData;
 
+    // Vector of IMU measurements from previous to current frame (to be filled by PreintegrateIMU)
+    std::vector<IMU::Point> mvImuFromLastFrame;
+    std::mutex mMutexImuQueue;
 
     // Imu calibration parameters
     IMU::Calib *mpImuCalib;

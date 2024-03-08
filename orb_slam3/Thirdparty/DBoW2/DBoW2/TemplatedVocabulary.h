@@ -1493,8 +1493,6 @@ bool TemplatedVocabulary<TDescriptor, F>::loadFromBinaryFile(const std::string& 
 
 // --------------------------------------------------------------------------
 
-
-
 template<class TDescriptor, class F>
 void TemplatedVocabulary<TDescriptor,F>::saveToTextFile(const std::string &filename) const
 {

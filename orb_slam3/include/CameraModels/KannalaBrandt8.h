@@ -21,6 +21,12 @@
 
 
 #include <assert.h>
+#include <vector>
+#include <opencv2/core/core.hpp>
+
+#include <boost/serialization/serialization.hpp>
+#include <boost/serialization/base_object.hpp>
+#include <boost/serialization/vector.hpp>
 
 #include "GeometricCamera.h"
 
@@ -63,6 +69,7 @@ namespace ORB_SLAM3 {
         }
 
         cv::Point2f project(const cv::Point3f &p3D);
+        cv::Point2f project(const cv::Mat& m3D);
         Eigen::Vector2d project(const Eigen::Vector3d & v3D);
         Eigen::Vector2f project(const Eigen::Vector3f & v3D);
         Eigen::Vector2f projectMat(const cv::Point3f& p3D);
@@ -71,9 +78,12 @@ namespace ORB_SLAM3 {
 
         Eigen::Vector3f unprojectEig(const cv::Point2f &p2D);
         cv::Point3f unproject(const cv::Point2f &p2D);
+        cv::Mat unprojectMat(const cv::Point2f &p2D);
 
+        cv::Mat projectJac(const cv::Point3f &p3D);
         Eigen::Matrix<double,2,3> projectJac(const Eigen::Vector3d& v3D);
 
+        cv::Mat unprojectJac(const cv::Point2f &p2D);
 
         bool ReconstructWithTwoViews(const std::vector<cv::KeyPoint>& vKeys1, const std::vector<cv::KeyPoint>& vKeys2, const std::vector<int> &vMatches12,
                                      Sophus::SE3f &T21, std::vector<cv::Point3f> &vP3D, std::vector<bool> &vbTriangulated);

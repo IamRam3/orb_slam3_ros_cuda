@@ -83,6 +83,79 @@ namespace ORB_SLAM3
     const int EDGE_THRESHOLD = 19;
 
 
+    static float IC_Angle(const Mat& image, Point2f pt,  const vector<int> & u_max)
+    {
+        int m_01 = 0, m_10 = 0;
+
+        const uchar* center = &image.at<uchar> (cvRound(pt.y), cvRound(pt.x));
+
+        // Treat the center line differently, v=0
+        for (int u = -HALF_PATCH_SIZE; u <= HALF_PATCH_SIZE; ++u)
+            m_10 += u * center[u];
+
+        // Go line by line in the circuI853lar patch
+        int step = (int)image.step1();
+        for (int v = 1; v <= HALF_PATCH_SIZE; ++v)
+        {
+            // Proceed over the two lines
+            int v_sum = 0;
+            int d = u_max[v];
+            for (int u = -d; u <= d; ++u)
+            {
+                int val_plus = center[u + v*step], val_minus = center[u - v*step];
+                v_sum += (val_plus - val_minus);
+                m_10 += u * (val_plus + val_minus);
+            }
+            m_01 += v * v_sum;
+        }
+
+        return fastAtan2((float)m_01, (float)m_10);
+    }
+
+
+    const float factorPI = (float)(CV_PI/180.f);
+    static void computeOrbDescriptor(const KeyPoint& kpt,
+                                     const Mat& img, const Point* pattern,
+                                     uchar* desc)
+    {
+        float angle = (float)kpt.angle*factorPI;
+        float a = (float)cos(angle), b = (float)sin(angle);
+
+        const uchar* center = &img.at<uchar>(cvRound(kpt.pt.y), cvRound(kpt.pt.x));
+        const int step = (int)img.step;
+
+#define GET_VALUE(idx) \
+        center[cvRound(pattern[idx].x*b + pattern[idx].y*a)*step + \
+               cvRound(pattern[idx].x*a - pattern[idx].y*b)]
+
+
+        for (int i = 0; i < 32; ++i, pattern += 16)
+        {
+            int t0, t1, val;
+            t0 = GET_VALUE(0); t1 = GET_VALUE(1);
+            val = t0 < t1;
+            t0 = GET_VALUE(2); t1 = GET_VALUE(3);
+            val |= (t0 < t1) << 1;
+            t0 = GET_VALUE(4); t1 = GET_VALUE(5);
+            val |= (t0 < t1) << 2;
+            t0 = GET_VALUE(6); t1 = GET_VALUE(7);
+            val |= (t0 < t1) << 3;
+            t0 = GET_VALUE(8); t1 = GET_VALUE(9);
+            val |= (t0 < t1) << 4;
+            t0 = GET_VALUE(10); t1 = GET_VALUE(11);
+            val |= (t0 < t1) << 5;
+            t0 = GET_VALUE(12); t1 = GET_VALUE(13);
+            val |= (t0 < t1) << 6;
+            t0 = GET_VALUE(14); t1 = GET_VALUE(15);
+            val |= (t0 < t1) << 7;
+
+            desc[i] = (uchar)val;
+        }
+
+#undef GET_VALUE
+    }
+
+
     static int bit_pattern_31_[256*4] =
             {
                     8,-3, 9,5/*mean (0), correlation (0)*/,
@@ -719,9 +792,10 @@ namespace ORB_SLAM3
         for (int level = 0; level < nlevels; ++level) {
             const int maxBorderX = mvImagePyramid[level].cols - EDGE_THRESHOLD + 3;
             const int maxBorderY = mvImagePyramid[level].rows - EDGE_THRESHOLD + 3;
+
             vector<cv::KeyPoint> vToDistributeKeys;
             vToDistributeKeys.reserve(nfeatures * 10);
-            
+
             // software pipelining
             if (level == 0) {
                 gpuFast.detectAsync(
@@ -760,8 +834,8 @@ namespace ORB_SLAM3
             // compute orientations
             // PS. I think this is a bug ? Seems like the launch and join needs to be in the same loop iteration else it breaks
             if (level != 0) {
-                ic_angle.join(allKeypoints[level - 1].data(), allKeypoints[level - 1].size());            }
-
+                ic_angle.join(allKeypoints[level - 1].data(), allKeypoints[level - 1].size());
+            }
         } // loop every level
 
         // compute orientations
@@ -772,7 +846,7 @@ namespace ORB_SLAM3
         ic_angle.join(allKeypoints[nlevels - 1].data(), allKeypoints[nlevels - 1].size());
     }
 
- 
+
     int ORBextractor::operator()( InputArray _image, InputArray _mask, vector<KeyPoint>& _keypoints,
                                   OutputArray _descriptors, std::vector<int> &vLappingArea)
     {

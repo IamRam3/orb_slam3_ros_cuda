@@ -59,6 +59,7 @@ namespace ORB_SLAM3 {
         ~GeometricCamera() {}
 
         virtual cv::Point2f project(const cv::Point3f &p3D) = 0;
+        virtual cv::Point2f project(const cv::Mat& m3D) = 0;
         virtual Eigen::Vector2d project(const Eigen::Vector3d & v3D) = 0;
         virtual Eigen::Vector2f project(const Eigen::Vector3f & v3D) = 0;
         virtual Eigen::Vector2f projectMat(const cv::Point3f& p3D) = 0;
@@ -67,8 +68,12 @@ namespace ORB_SLAM3 {
 
         virtual Eigen::Vector3f unprojectEig(const cv::Point2f &p2D) = 0;
         virtual cv::Point3f unproject(const cv::Point2f &p2D) = 0;
+        virtual cv::Mat unprojectMat(const cv::Point2f &p2D) = 0;
 
+        virtual cv::Mat projectJac(const cv::Point3f &p3D) = 0;
         virtual Eigen::Matrix<double,2,3> projectJac(const Eigen::Vector3d& v3D) = 0;
+
+        virtual cv::Mat unprojectJac(const cv::Point2f &p2D) = 0;
 
         virtual bool ReconstructWithTwoViews(const std::vector<cv::KeyPoint>& vKeys1, const std::vector<cv::KeyPoint>& vKeys2, const std::vector<int> &vMatches12,
                                              Sophus::SE3f &T21, std::vector<cv::Point3f> &vP3D, std::vector<bool> &vbTriangulated) = 0;

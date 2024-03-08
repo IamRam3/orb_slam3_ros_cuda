@@ -60,6 +60,8 @@ class Atlas
         //ar & mspMaps;
         ar & mvpBackupMaps;
         ar & mvpCameras;
+        //ar & mvpBackupCamPin;
+        //ar & mvpBackupCamKan;
         // Need to save/load the static Id from Frame, KeyFrame, MapPoint and Map
         ar & Map::nNextId;
         ar & Frame::nNextId;
@@ -149,6 +151,11 @@ protected:
     Map* mpCurrentMap;
 
     std::vector<GeometricCamera*> mvpCameras;
+    std::vector<KannalaBrandt8*> mvpBackupCamKan;
+    std::vector<Pinhole*> mvpBackupCamPin;
+
+    //Pinhole testCam;
+    std::mutex mMutexAtlas;
 
     unsigned long int mnLastInitKFidMap;
 

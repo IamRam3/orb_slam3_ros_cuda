@@ -20,6 +20,8 @@
 #ifndef FRAME_H
 #define FRAME_H
 
+//#define SAVE_TIMES
+
 #include<vector>
 
 #include "Thirdparty/DBoW2/DBoW2/BowVector.h"
