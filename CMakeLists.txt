@@ -100,6 +100,7 @@ include_directories(
   ${Pangolin_INCLUDE_DIRS}
   ${CUDA_TOOLKIT_ROOT_DIR}/samples/common/inc
   ${catkin_INCLUDE_DIRS}
+  ${CUDA_INCLUDE_DIRS}
 )
 
 include(${PROJECT_SOURCE_DIR}/orb_slam3/Thirdparty/DBoW2/CMakeLists.txt)
