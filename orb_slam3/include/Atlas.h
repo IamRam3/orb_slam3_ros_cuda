@@ -166,9 +166,6 @@ protected:
     KeyFrameDatabase* mpKeyFrameDB;
     ORBVocabulary* mpORBVocabulary;
 
-    // Mutex
-    std::mutex mMutexAtlas;
-
 
 }; // class Atlas
 

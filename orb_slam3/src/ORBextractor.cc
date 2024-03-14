@@ -817,9 +817,6 @@ namespace ORB_SLAM3
                 mpGaussianFilter->apply(gMat, gMat, ic_angle.cvStream());
             }
 
-
-            }
-
             vector<KeyPoint> &keypoints = allKeypoints[level];
             keypoints.reserve(nfeatures);
 
